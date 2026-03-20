@@ -24,3 +24,8 @@ type DeviceRepository interface {
 	Create(ctx context.Context, device *Device) error
 	UpdateCurrentUnit(ctx context.Context, id uuid.UUID, unitID uuid.UUID) error
 }
+
+type OrganizationRepository interface {
+	Create(ctx context.Context, org *Organization) error
+	GetByID(ctx context.Context, id uuid.UUID) (*Organization, error)
+}

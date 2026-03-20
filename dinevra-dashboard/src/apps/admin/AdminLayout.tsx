@@ -2,9 +2,9 @@ import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
 import { Toaster, toast } from 'react-hot-toast';
 import { Plus, Store, TabletSmartphone, Users, LogOut } from 'lucide-react';
-import { useAuth, Sector } from '../auth/AuthContext';
+import { useAuth, FacilityType } from '../auth/AuthContext';
 
-const getNavItems = (sector: Sector = 'RESTAURANT') => {
+const getNavItems = (type: FacilityType = 'RESTAURANT') => {
   const labels = {
     RESTAURANT: { units: 'Locations & Kitchens', menu: 'Menu Builder', pos: 'POS Devices', settings: 'Settings' },
     CAMPUS: { units: 'Dining Halls & Units', menu: 'Meal Plans', pos: 'Service Terminals', settings: 'Campus Settings' },
@@ -13,7 +13,7 @@ const getNavItems = (sector: Sector = 'RESTAURANT') => {
     CORPORATE: { units: 'Offices & Cafeterias', menu: 'Refreshment Manager', pos: 'Self-Service', settings: 'Office Settings' },
   };
 
-  const s = labels[sector] || labels.RESTAURANT;
+  const s = labels[type] || labels.RESTAURANT;
 
   return [
     { name: 'Overview', href: '/admin' },
@@ -26,11 +26,11 @@ const getNavItems = (sector: Sector = 'RESTAURANT') => {
 
 export default function AdminLayout() {
   const location = useLocation();
-  const { logout, sector } = useAuth();
+  const { logout, facilityType } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const navItems = getNavItems(sector);
+  const navItems = getNavItems(facilityType);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -54,7 +54,7 @@ export default function AdminLayout() {
       <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
         <div className="h-16 flex items-center px-6 border-b border-gray-200">
           <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-blue-500">
-            Dinevra {sector.charAt(0) + sector.slice(1).toLowerCase()}
+            Dinevra {facilityType.charAt(0) + facilityType.slice(1).toLowerCase()}
           </span>
         </div>
         <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
@@ -83,7 +83,7 @@ export default function AdminLayout() {
               </div>
               <div className="flex flex-col">
                 <span className="text-sm font-medium text-gray-900 leading-tight">Manager</span>
-                <span className="text-xs text-gray-500">{sector.charAt(0) + sector.slice(1).toLowerCase()} Admin</span>
+                <span className="text-xs text-gray-500">{facilityType.charAt(0) + facilityType.slice(1).toLowerCase()} Admin</span>
               </div>
             </div>
             

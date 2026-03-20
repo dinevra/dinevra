@@ -1,0 +1,55 @@
+package http
+
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"dinevra-backend/internal/domain"
+)
+
+type AuthHandler struct {
+	authUsecase domain.AuthUsecase
+}
+
+func NewAuthHandler(rg *gin.RouterGroup, authUsecase domain.AuthUsecase) {
+	h := &AuthHandler{authUsecase: authUsecase}
+	auth := rg.Group("/auth")
+	auth.POST("/signup", h.Signup)
+	auth.POST("/login", h.Login)
+}
+
+func (h *AuthHandler) Signup(c *gin.Context) {
+	var req domain.SignupRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	resp, err := h.authUsecase.Signup(c.Request.Context(), &req)
+	if err != nil {
+		if err.Error() == "email already in use" {
+			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "signup failed"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, resp)
+}
+
+func (h *AuthHandler) Login(c *gin.Context) {
+	var req domain.LoginRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	resp, err := h.authUsecase.Login(c.Request.Context(), &req)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid email or password"})
+		return
+	}
+
+	c.JSON(http.StatusOK, resp)
+}

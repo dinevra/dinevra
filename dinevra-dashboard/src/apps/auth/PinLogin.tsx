@@ -1,13 +1,23 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { ArrowLeft, Clock } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function PinLogin() {
   const [pin, setPin] = useState<string>('');
   const [isClockingIn, setIsClockingIn] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Retrieve the selected staff from the navigation state
+  const selectedStaff = location.state?.staff || { 
+    id: 0, 
+    name: 'Staff Member', 
+    initials: '??', 
+    color: 'bg-gray-100 text-gray-500' 
+  };
 
   const handleKeyPress = (num: string) => {
     if (pin.length < 6) {
@@ -24,88 +34,103 @@ export default function PinLogin() {
   };
 
   const verifyPin = (submittedPin: string) => {
-    // Mock Verification
-    setTimeout(() => {
-      login('StaffMember');
-      if (!isClockingIn) {
-        navigate('/pos');
-      } else {
+    // Mock Verification logic
+    if (submittedPin === selectedStaff.pin) {
+      setTimeout(() => {
+        if (isClockingIn) {
+          toast.success(`${selectedStaff.name} clocked in successfully!`);
+          setPin('');
+        } else {
+          login(selectedStaff.name);
+          navigate('/admin');
+        }
+      }, 400);
+    } else {
+      setTimeout(() => {
+        toast.error('Invalid PIN. Please try again.');
         setPin('');
-      }
-    }, 400);
+      }, 200);
+    }
   };
 
-  const dummyStaff = [
-    { id: 1, name: 'JD', initials: 'JD', color: 'bg-indigo-100 text-indigo-700' },
-    { id: 2, name: 'Sarah', initials: 'SM', color: 'bg-emerald-100 text-emerald-700' },
-    { id: 3, name: 'Mike', initials: 'MT', color: 'bg-amber-100 text-amber-700' },
-    { id: 4, name: 'Elena', initials: 'ER', color: 'bg-rose-100 text-rose-700' },
-    { id: 5, name: 'Chris', initials: 'CH', color: 'bg-cyan-100 text-cyan-700' },
-    { id: 6, name: 'Alex', initials: 'AL', color: 'bg-fuchsia-100 text-fuchsia-700' },
-    { id: 7, name: 'Kim', initials: 'KK', color: 'bg-violet-100 text-violet-700' },
-    { id: 8, name: 'Sam', initials: 'SS', color: 'bg-orange-100 text-orange-700' },
-  ];
-
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-gray-50 font-sans text-gray-900 border-t-8 border-blue-600 select-none">
-      <button onClick={() => navigate('/login')} className="absolute top-6 left-6 p-2 bg-white rounded-full shadow-sm text-gray-500 hover:text-gray-900 transition-colors">
-        <ArrowLeft size={24} />
-      </button>
+    <div className="flex h-screen bg-white font-sans text-gray-900 overflow-hidden select-none">
+      {/* LEFT PANE: 60% Branding */}
+      <div className="hidden lg:flex flex-col flex-[0.6] bg-gradient-to-br from-blue-600 to-blue-900 p-12 relative overflow-hidden">
+        {/* Abstract Graphic Rings */}
+        <div className="absolute top-[-10%] left-[-10%] w-[120%] h-[120%] pointer-events-none opacity-20">
+          <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] border-[40px] border-white/20 rounded-full" />
+          <div className="absolute top-1/2 left-0 w-[800px] h-[800px] border-[2px] border-white/30 rounded-full" />
+        </div>
+        
+        <div className="relative z-10 flex items-center gap-3">
+          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg">
+            <span className="text-blue-600 text-2xl font-black tracking-tighter">D</span>
+          </div>
+          <span className="font-bold text-2xl text-white tracking-tight">Dinevra</span>
+        </div>
 
-      {/* Staff Grid Profile Selection */}
-      <div className="flex-[0.5] p-12 flex flex-col justify-center items-center border-r border-gray-200 bg-white">
-        <h2 className="text-3xl font-black tracking-tight mb-12">Select Profile</h2>
-        <div className="grid grid-cols-4 gap-6">
-          {dummyStaff.map(staff => (
-            <button key={staff.id} className="group flex flex-col items-center gap-3">
-              <div className={`w-20 h-20 rounded-2xl flex items-center justify-center font-bold text-2xl transition-transform group-hover:scale-105 group-active:scale-95 shadow-sm border border-gray-100 ${staff.color}`}>
-                {staff.initials}
-              </div>
-              <span className="font-semibold text-gray-600">{staff.name}</span>
-            </button>
-          ))}
+        <div className="relative z-10 mt-auto pb-12">
+          <h1 className="text-5xl font-black text-white leading-[1.1] max-w-lg tracking-tighter">
+            Secure Access <br/> for your Team
+          </h1>
+          <p className="mt-6 text-xl text-blue-100 max-w-md font-medium">
+            Fast, secure PIN entry for frontline staff members to access their specific tools.
+          </p>
         </div>
       </div>
 
-      {/* PIN Keypad Section */}
-      <div className="flex-[0.5] bg-gray-50 flex flex-col justify-center items-center p-12 relative">
-        <div className="w-full max-w-sm flex flex-col items-center">
-          <h3 className="text-xl font-bold text-gray-500 tracking-widest uppercase mb-8 text-center w-full">Enter PIN</h3>
+      {/* RIGHT PANE: 40% PIN Keypad */}
+      <div className="flex-1 flex flex-col justify-center px-4 sm:px-12 lg:px-20 relative bg-white overflow-y-auto">
+        <button onClick={() => navigate('/login')} className="absolute top-8 left-8 p-2 text-gray-400 hover:text-gray-900 transition-colors flex items-center gap-2 font-semibold text-sm">
+          <ArrowLeft size={20} />
+          Back to Login
+        </button>
+
+        <div className="w-full max-w-sm mx-auto flex flex-col items-center">
+          {/* Selected User Header */}
+          <div className="flex flex-col items-center mb-10 text-center">
+            <div className={`w-28 h-28 rounded-[2rem] flex items-center justify-center font-bold text-4xl mb-6 shadow-xl border-4 border-white ${selectedStaff.color}`}>
+              {selectedStaff.initials}
+            </div>
+            <h2 className="text-3xl font-black text-gray-900 tracking-tight">Welcome back, {selectedStaff.name}</h2>
+            <p className="mt-2 text-sm text-gray-500 font-medium tracking-wide uppercase">Enter your security PIN</p>
+          </div>
           
           {/* 6-Dot PIN Indicator */}
-          <div className="flex gap-4 mb-16 h-4">
+          <div className="flex gap-4 mb-12 h-4">
             {[0, 1, 2, 3, 4, 5].map((idx) => (
               <div 
                 key={idx} 
-                className={`w-4 h-4 rounded-full transition-all duration-200 ${
-                  pin.length > idx ? 'bg-blue-600 scale-110 shadow-[0_0_12px_rgba(37,99,235,0.5)]' : 'bg-gray-300'
+                className={`w-4 h-4 rounded-full transition-all duration-300 ${
+                  pin.length > idx ? 'bg-blue-600 scale-125 shadow-[0_0_15px_rgba(37,99,235,0.6)]' : 'bg-gray-200'
                 }`} 
               />
             ))}
           </div>
 
           {/* Clock-In Logic Toggle */}
-          <div className="mb-8 w-full">
+          <div className="mb-10 w-full px-4">
             <button 
               onClick={() => setIsClockingIn(!isClockingIn)}
-              className={`w-full py-4 rounded-xl flex items-center justify-center gap-3 font-bold text-lg transition-all shadow-sm ${
+              className={`w-full py-4 rounded-xl flex items-center justify-center gap-3 font-bold text-sm transition-all shadow-sm ${
                 isClockingIn 
-                  ? 'bg-green-100 text-green-700 border-2 border-green-500 shadow-green-500/20' 
-                  : 'bg-white text-gray-400 border-2 border-transparent hover:bg-gray-100'
+                  ? 'bg-green-100 text-green-700 border-2 border-green-500 shadow-green-500/10' 
+                  : 'bg-gray-50 text-gray-400 border-2 border-transparent hover:bg-gray-100'
               }`}
             >
-              <Clock size={20} className={isClockingIn ? 'animate-pulse' : ''} />
-              {isClockingIn ? 'Clocking In...' : 'Tap here to Clock In'}
+              <Clock size={16} className={isClockingIn ? 'animate-pulse' : ''} />
+              {isClockingIn ? 'Clocking In...' : 'Register as Clocked In'}
             </button>
           </div>
 
           {/* 3x4 Keypad */}
-          <div className="grid grid-cols-3 gap-4 w-full px-4">
+          <div className="grid grid-cols-3 gap-3 w-full px-4">
             {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map(num => (
               <button 
                 key={num} 
                 onClick={() => handleKeyPress(num)}
-                className="h-20 bg-white border border-gray-200 rounded-2xl text-3xl font-bold text-gray-800 shadow-sm hover:border-blue-500 active:bg-blue-50 active:scale-95 transition-all"
+                className="h-20 bg-gray-50 border border-transparent rounded-2xl text-3xl font-bold text-gray-800 transition-all hover:bg-white hover:border-blue-200 hover:shadow-md active:scale-95 active:bg-blue-50"
               >
                 {num}
               </button>
@@ -113,13 +138,13 @@ export default function PinLogin() {
             <div className="h-20" /> {/* Empty Slot */}
             <button 
               onClick={() => handleKeyPress('0')}
-              className="h-20 bg-white border border-gray-200 rounded-2xl text-3xl font-bold text-gray-800 shadow-sm hover:border-blue-500 active:bg-blue-50 active:scale-95 transition-all"
+              className="h-20 bg-gray-50 border border-transparent rounded-2xl text-3xl font-bold text-gray-800 transition-all hover:bg-white hover:border-blue-200 hover:shadow-md active:scale-95 active:bg-blue-50"
             >
               0
             </button>
             <button 
               onClick={handleDelete}
-              className="h-20 bg-transparent flex items-center justify-center rounded-2xl text-gray-400 hover:text-gray-900 active:scale-95 transition-all"
+              className="h-20 bg-transparent flex items-center justify-center rounded-2xl text-gray-400 hover:text-red-500 active:scale-95 transition-all"
             >
               <ArrowLeft size={32} />
             </button>

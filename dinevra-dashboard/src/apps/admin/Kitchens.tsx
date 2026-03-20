@@ -5,7 +5,7 @@ import { useAuth } from '../auth/AuthContext';
 
 export default function Kitchens() {
   const navigate = useNavigate();
-  const { sector } = useAuth();
+  const { facilityType } = useAuth();
   
   const labels = {
     RESTAURANT: { title: 'Kitchens Management', subTitle: 'Monitor and launch your active kitchen display systems.', action: 'New Kitchen', monitor: 'Launch KDS' },
@@ -15,7 +15,7 @@ export default function Kitchens() {
     CORPORATE: { title: 'Refreshment Hubs', subTitle: 'Monitor office cafeterias and self-service hubs.', action: 'New Hub', monitor: 'Open Refreshment Hub' },
   };
 
-  const s = labels[sector] || labels.RESTAURANT;
+  const s = labels[facilityType] || labels.RESTAURANT;
 
   // Dummy units (mapping from 'kitchens' in dummy data)
   const units = [

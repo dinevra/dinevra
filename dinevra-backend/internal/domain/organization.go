@@ -7,11 +7,11 @@ import (
 )
 
 type Organization struct {
-	ID        uuid.UUID `json:"id" db:"id"`
-	Name      string    `json:"name" db:"name"`
-	Sector    string    `json:"sector" db:"sector"` // 'RESTAURANT', 'CAMPUS', 'HEALTHCARE', 'GYM', 'CORPORATE'
-	CreatedAt time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
+	ID           uuid.UUID `json:"id" db:"id"`
+	Name         string    `json:"name" db:"name"`
+	FacilityType string    `json:"facility_type" db:"facility_type"` // 'RESTAURANT', 'CAMPUS', 'HEALTHCARE', 'GYM', 'CORPORATE'
+	CreatedAt    time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at" db:"updated_at"`
 }
 
 type Location struct {

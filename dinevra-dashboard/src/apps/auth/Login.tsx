@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from './AuthContext';
+import toast from 'react-hot-toast';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -9,20 +10,39 @@ export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSignIn = (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setTimeout(() => {
-      login(email || 'Manager');
+
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+      const res = await fetch(`${apiUrl}/api/v1/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.error || 'Invalid email or password.');
+        setIsLoading(false);
+        return;
+      }
+
+      login(data.user?.email || email, data.token);
       navigate('/admin');
-    }, 1000);
+    } catch {
+      toast.error('Unable to connect to the server. Is the backend running?');
+      setIsLoading(false);
+    }
   };
 
   const dummyStaff = [
-    { id: 1, name: 'JD', initials: 'JD', color: 'bg-indigo-100 text-indigo-700' },
-    { id: 2, name: 'Sarah', initials: 'SM', color: 'bg-emerald-100 text-emerald-700' },
-    { id: 3, name: 'Mike', initials: 'MT', color: 'bg-amber-100 text-amber-700' },
-    { id: 4, name: 'Elena', initials: 'ER', color: 'bg-rose-100 text-rose-700' },
+    { id: 1, name: 'JD', initials: 'JD', color: 'bg-indigo-100 text-indigo-700', pin: '123456' },
+    { id: 2, name: 'Sarah', initials: 'SM', color: 'bg-emerald-100 text-emerald-700', pin: '222222' },
+    { id: 3, name: 'Mike', initials: 'MT', color: 'bg-amber-100 text-amber-700', pin: '333333' },
+    { id: 4, name: 'Elena', initials: 'ER', color: 'bg-rose-100 text-rose-700', pin: '444444' },
   ];
 
   return (
@@ -54,9 +74,6 @@ export default function Login() {
 
       {/* RIGHT PANE: 40% Form */}
       <div className="flex-1 flex flex-col justify-center px-4 sm:px-12 lg:px-20 relative bg-white overflow-y-auto">
-        <div className="absolute top-8 right-8 text-sm font-medium text-gray-500">
-          Don't have an account? <Link to="/signup" className="text-blue-600 hover:text-blue-700 font-bold ml-1">Sign up</Link>
-        </div>
 
         <div className="w-full max-w-sm mx-auto">
           <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">Welcome back</h2>
@@ -71,7 +88,7 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="block w-full px-4 py-3 bg-gray-100 border border-transparent rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent sm:text-sm font-medium transition-colors"
-                placeholder="admin@restaurant.com"
+                placeholder="admin@organization.com"
               />
             </div>
 
@@ -103,6 +120,9 @@ export default function Login() {
                 'Sign In'
               )}
             </button>
+            <div className="mt-6 text-center text-sm font-medium text-gray-500">
+              Don't have an account? <Link to="/signup" className="text-blue-600 hover:text-blue-700 font-bold ml-1">Sign up</Link>
+            </div>
           </form>
 
           {/* Quick Staff Login */}
@@ -112,7 +132,7 @@ export default function Login() {
               {dummyStaff.map(staff => (
                 <button 
                   key={staff.id}
-                  onClick={() => navigate('/pin')}
+                  onClick={() => navigate('/pin', { state: { staff } })}
                   className="group flex flex-col items-center gap-2"
                 >
                   <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm transition-transform group-hover:scale-110 group-active:scale-95 shadow-sm border border-white ${staff.color}`}>

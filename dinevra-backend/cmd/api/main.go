@@ -17,9 +17,8 @@ import (
 )
 
 func main() {
-	_ = godotenv.Load() // ignore error, as it might be set via env vars
+	_ = godotenv.Load()
 
-	// Initialize Database
 	ctx := context.Background()
 	pool, err := db.ConnectPostgres(ctx)
 	if err != nil {
@@ -27,28 +26,41 @@ func main() {
 	}
 	defer pool.Close()
 
-	// Initialize Redis
 	redisClient, err := redis.ConnectRedis(ctx)
 	if err != nil {
-		log.Printf("Redis initialization failed: %v", err) // maybe allow failure for dev
+		log.Printf("Redis initialization failed: %v", err)
 	}
-	
-	// Setup WebSocket Hub
+
+	// WebSocket Hub
 	hub := ws.NewHub(redisClient)
 	go hub.Run(ctx)
 	broadcaster := ws.NewRedisBroadcaster(hub)
 
-	// Setup Repositories
+	// Repositories
 	orderRepo := postgres.NewOrderRepository(pool)
-	// userRepo := postgres.NewUserRepository(pool)
-	// deviceRepo := postgres.NewDeviceRepository(pool)
+	userRepo := postgres.NewUserRepository(pool)
+	orgRepo := postgres.NewOrganizationRepository(pool)
 
-	// Setup Usecases
+	// Usecases
 	orderUsecase := usecase.NewOrderUsecase(orderRepo, broadcaster)
 	paymentUsecase := usecase.NewPaymentUsecase(orderRepo, broadcaster)
+	authUsecase := usecase.NewAuthUsecase(userRepo, orgRepo)
 
-	// Setup Router
+	// Router
 	router := gin.Default()
+
+	// CORS — allow Vite dev server and production
+	router.Use(func(c *gin.Context) {
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS")
+		c.Header("Access-Control-Allow-Headers", "Origin,Content-Type,Authorization")
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+		c.Next()
+	})
+
 	apiV1 := router.Group("/api/v1")
 	{
 		apiV1.GET("/health", func(c *gin.Context) {
@@ -56,16 +68,16 @@ func main() {
 		})
 	}
 
-	// Setup Handlers
+	// Handlers
 	delivery_http.NewOrderHandler(apiV1, orderUsecase)
 	delivery_http.NewPaymentHandler(apiV1, paymentUsecase)
+	delivery_http.NewAuthHandler(apiV1, authUsecase)
 
-	// Setup WebSocket route
+	// WebSocket
 	router.GET("/ws", func(c *gin.Context) {
 		ws.ServeWs(hub, c)
 	})
 
-	// Start Server
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
