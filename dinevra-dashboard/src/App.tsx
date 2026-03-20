@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './apps/auth/AuthContext';
 import Login from './apps/auth/Login';
+import Signup from './apps/auth/Signup';
+import PinLogin from './apps/auth/PinLogin';
 import ForgotPassword from './apps/auth/ForgotPassword';
 import AdminLayout from './apps/admin/AdminLayout';
 import Overview from './apps/admin/Overview';
@@ -30,6 +32,8 @@ function App() {
         {/* Public Application Landing Page */}
         <Route path="/" element={<UnderConstruction />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/pin" element={<PinLogin />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         
         {/* Admin Dashboard Routes - Protected */}
