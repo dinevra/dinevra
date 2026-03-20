@@ -4,12 +4,14 @@ import Overview from './apps/admin/Overview';
 import Kitchens from './apps/admin/Kitchens';
 import Settings from './apps/admin/Settings';
 import KdsView from './apps/kitchen/KdsView';
+import UnderConstruction from './apps/shared/UnderConstruction';
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Navigate to="/admin" replace />} />
+        {/* Public Application Landing Page */}
+        <Route path="/" element={<UnderConstruction />} />
         
         {/* Admin Dashboard Routes */}
         <Route path="/admin/*" element={<AdminLayout />}>

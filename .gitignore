@@ -50,7 +50,9 @@ dinevra-infra/
 dinevra-ai/
 GO/
 
-# Env
+# Env and Secrets
 .env
 .env.local
 .env.*.local
+*.pem
+terraform/*.pem

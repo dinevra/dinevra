@@ -14,5 +14,5 @@ provider "aws" {
 variable "domain_name" {
   type        = string
   description = "Domain name for the frontend dashboard"
-  default     = "admin.dinevra.com"
+  default     = "app.dinevra.com"
 }
