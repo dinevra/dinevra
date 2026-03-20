@@ -6,6 +6,8 @@ import AdminLayout from './apps/admin/AdminLayout';
 import Overview from './apps/admin/Overview';
 import Kitchens from './apps/admin/Kitchens';
 import Settings from './apps/admin/Settings';
+import PosLayout from './apps/pos/PosLayout';
+import PosTerminal from './apps/pos/PosTerminal';
 import KdsView from './apps/kitchen/KdsView';
 import UnderConstruction from './apps/shared/UnderConstruction';
 
@@ -44,6 +46,21 @@ function App() {
           <Route path="menu" element={<div className="p-8">Menu Builder</div>} />
           <Route path="devices" element={<div className="p-8">Devices & POS</div>} />
           <Route path="settings" element={<Settings />} />
+        </Route>
+
+        {/* Web POS Route - Protected */}
+        <Route 
+          path="/pos" 
+          element={
+            <ProtectedRoute>
+              <PosLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<PosTerminal />} />
+          <Route path="kitchen" element={<div className="p-8 font-bold text-gray-400">Kitchen Display UI module coming soon.</div>} />
+          <Route path="orders" element={<div className="p-8 font-bold text-gray-400">Order History UI module coming soon.</div>} />
+          <Route path="menu" element={<div className="p-8 font-bold text-gray-400">Menu Modifier UI module coming soon.</div>} />
         </Route>
 
         {/* Kitchen Display System Route - Protected */}
