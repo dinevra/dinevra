@@ -1,4 +1,6 @@
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
+import { Plus } from 'lucide-react';
 
 export default function Kitchens() {
   const navigate = useNavigate();
@@ -17,6 +19,13 @@ export default function Kitchens() {
           <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Kitchens Management</h2>
           <p className="text-sm text-gray-500 mt-1">Monitor and launch your active kitchen display systems.</p>
         </div>
+        <button 
+          onClick={() => toast.success('Kitchen deployment wizard opening soon!')}
+          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition shadow-sm active:scale-95"
+        >
+          <Plus size={16} />
+          New Kitchen
+        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
