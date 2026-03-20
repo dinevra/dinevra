@@ -1,0 +1,56 @@
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# React / Vite Build Output
+dinevra-dashboard/dist/
+dinevra-dashboard/build/
+
+# Go output
+dinevra-backend/bin/
+dinevra-backend/*.test
+dinevra-backend/*.out
+
+# Android / Gradle (Inside dinevra-pos)
+dinevra-pos/.gradle/
+dinevra-pos/build/
+dinevra-pos/app/build/
+dinevra-pos/local.properties
+dinevra-pos/.cxx/
+
+# Terraform
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.backup
+terraform/.terraform.lock.hcl
+
+# Unused/Scaffolded Repositories to ignore
+dinevra-kitchen/
+dinevra-infra/
+dinevra-ai/
+GO/
+
+# Env
+.env
+.env.local
+.env.*.local
