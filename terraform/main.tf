@@ -16,3 +16,9 @@ variable "domain_name" {
   description = "Domain name for the frontend dashboard"
   default     = "app.dinevra.com"
 }
+
+variable "marketing_domain_name" {
+  type        = string
+  description = "Domain name for the marketing website"
+  default     = "www.dinevra.com"
+}
