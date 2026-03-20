@@ -67,8 +67,8 @@ func (u *paymentUsecase) HandleStripeWebhook(ctx context.Context, payload []byte
 	if err == nil {
 		_ = u.orderRepo.UpdateStatus(ctx, orderID, "paid")
 		if u.broadcaster != nil {
-			// Find kitendID safely... assuming we got it from the order
-			// _ = u.broadcaster.BroadcastOrderStatusUpdated(ctx, kitchenID, orderID, "paid")
+			// Find unitID safely... assuming we got it from the order
+			// _ = u.broadcaster.BroadcastOrderStatusUpdated(ctx, unitID, orderID, "paid")
 		}
 	}
 

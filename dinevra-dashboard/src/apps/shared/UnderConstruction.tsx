@@ -15,7 +15,7 @@ export default function UnderConstruction() {
         </h1>
         
         <p className="text-xl md:text-2xl text-gray-400 font-medium max-w-2xl mx-auto leading-relaxed">
-          The AI-Native Operating System for modern dining is currently under construction.
+          The AI-Native Operating System for modern organizations is currently under construction.
         </p>
 
         <div className="pt-12">

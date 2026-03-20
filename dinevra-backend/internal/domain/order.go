@@ -8,7 +8,7 @@ import (
 
 type Order struct {
 	ID          uuid.UUID   `json:"id" db:"id"`
-	KitchenID   *uuid.UUID  `json:"kitchen_id" db:"kitchen_id"`
+	UnitID      *uuid.UUID  `json:"unit_id" db:"unit_id"`
 	DeviceID    *uuid.UUID  `json:"device_id" db:"device_id"`
 	UserID      *uuid.UUID  `json:"user_id" db:"user_id"`
 	Status      string      `json:"status" db:"status"` // 'new', 'preparing', 'ready', 'completed', 'cancelled'

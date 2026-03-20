@@ -1,8 +1,12 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
 import toast from 'react-hot-toast';
 
+export type Sector = 'RESTAURANT' | 'CAMPUS' | 'HEALTHCARE' | 'GYM' | 'CORPORATE';
+
 interface AuthContextType {
   isAuthenticated: boolean;
+  sector: Sector;
+  setSector: (sector: Sector) => void;
   login: (email: string) => void;
   logout: () => void;
 }
@@ -14,6 +18,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     return localStorage.getItem('dinevra_auth') === 'true';
   });
+
+  const [sector, setSectorState] = useState<Sector>(() => {
+    return (localStorage.getItem('dinevra_sector') as Sector) || 'RESTAURANT';
+  });
+
+  const setSector = (s: Sector) => {
+    setSectorState(s);
+    localStorage.setItem('dinevra_sector', s);
+  };
 
   const login = (email: string) => {
     setIsAuthenticated(true);
@@ -28,7 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, sector, setSector, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

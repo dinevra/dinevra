@@ -10,60 +10,60 @@ import (
 )
 
 type Hub struct {
-	KitchenClients map[uuid.UUID]map[*Client]bool
-	Register       chan *Client
-	Unregister     chan *Client
-	Broadcast      chan []byte
-	RedisClient    *redis.Client
+	UnitClients map[uuid.UUID]map[*Client]bool
+	Register    chan *Client
+	Unregister  chan *Client
+	Broadcast   chan []byte
+	RedisClient *redis.Client
 }
 
 func NewHub(redisClient *redis.Client) *Hub {
 	return &Hub{
-		KitchenClients: make(map[uuid.UUID]map[*Client]bool),
-		Register:       make(chan *Client),
-		Unregister:     make(chan *Client),
-		Broadcast:      make(chan []byte),
-		RedisClient:    redisClient,
+		UnitClients: make(map[uuid.UUID]map[*Client]bool),
+		Register:    make(chan *Client),
+		Unregister:  make(chan *Client),
+		Broadcast:   make(chan []byte),
+		RedisClient: redisClient,
 	}
 }
 
 func (h *Hub) Run(ctx context.Context) {
-	// Start listening to Redis pubsub if needed, or handle it per kitchen
+	// Start listening to Redis pubsub if needed, or handle it per unit
 	for {
 		select {
 		case client := <-h.Register:
-			if _, ok := h.KitchenClients[client.KitchenID]; !ok {
-				h.KitchenClients[client.KitchenID] = make(map[*Client]bool)
-				// Subscribe to Redis channel for this kitchen
-				go h.SubscribeToKitchenChannel(ctx, client.KitchenID)
+			if _, ok := h.UnitClients[client.UnitID]; !ok {
+				h.UnitClients[client.UnitID] = make(map[*Client]bool)
+				// Subscribe to Redis channel for this unit
+				go h.SubscribeToUnitChannel(ctx, client.UnitID)
 			}
-			h.KitchenClients[client.KitchenID][client] = true
-			log.Printf("Client registered to kitchen: %s", client.KitchenID)
+			h.UnitClients[client.UnitID][client] = true
+			log.Printf("Client registered to unit: %s", client.UnitID)
 
 		case client := <-h.Unregister:
-			if clients, ok := h.KitchenClients[client.KitchenID]; ok {
+			if clients, ok := h.UnitClients[client.UnitID]; ok {
 				if _, ok := clients[client]; ok {
 					delete(clients, client)
 					close(client.Send)
 					if len(clients) == 0 {
-						delete(h.KitchenClients, client.KitchenID)
+						delete(h.UnitClients, client.UnitID)
 						// Unsubscribe from Redis channel
 					}
-					log.Printf("Client unregistered from kitchen: %s", client.KitchenID)
+					log.Printf("Client unregistered from unit: %s", client.UnitID)
 				}
 			}
 
 		case message := <-h.Broadcast:
-			// In a real scenario, this message would contain the target kitchenID
+			// In a real scenario, this message would contain the target unitID
 			// and we would broadcast it via Redis to all instances.
 			_ = message
 		}
 	}
 }
 
-// PublishEvent sends a message to the Redis Pub/Sub channel for a specific kitchen
-func (h *Hub) PublishEvent(ctx context.Context, kitchenID uuid.UUID, eventType string, payload interface{}) error {
-	channel := "channel:kitchen:" + kitchenID.String() + ":events"
+// PublishEvent sends a message to the Redis Pub/Sub channel for a specific unit
+func (h *Hub) PublishEvent(ctx context.Context, unitID uuid.UUID, eventType string, payload interface{}) error {
+	channel := "channel:unit:" + unitID.String() + ":events"
 
 	msg := map[string]interface{}{
 		"type":    eventType,
@@ -77,16 +77,16 @@ func (h *Hub) PublishEvent(ctx context.Context, kitchenID uuid.UUID, eventType s
 	return h.RedisClient.Publish(ctx, channel, data).Err()
 }
 
-// SubscribeToKitchenChannel listens for messages on a Redis channel and forwards them to local connected WS clients
-func (h *Hub) SubscribeToKitchenChannel(ctx context.Context, kitchenID uuid.UUID) {
-	channel := "channel:kitchen:" + kitchenID.String() + ":events"
+// SubscribeToUnitChannel listens for messages on a Redis channel and forwards them to local connected WS clients
+func (h *Hub) SubscribeToUnitChannel(ctx context.Context, unitID uuid.UUID) {
+	channel := "channel:unit:" + unitID.String() + ":events"
 	pubsub := h.RedisClient.Subscribe(ctx, channel)
 	defer pubsub.Close()
 
 	ch := pubsub.Channel()
 
 	for msg := range ch {
-		clients, ok := h.KitchenClients[kitchenID]
+		clients, ok := h.UnitClients[unitID]
 		if ok {
 			for client := range clients {
 				select {

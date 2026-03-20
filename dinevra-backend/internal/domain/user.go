@@ -15,8 +15,8 @@ type User struct {
 	CreatedAt      time.Time `json:"created_at" db:"created_at"`
 }
 
-type UserKitchenAccess struct {
-	UserID    uuid.UUID `json:"user_id" db:"user_id"`
-	KitchenID uuid.UUID `json:"kitchen_id" db:"kitchen_id"`
-	Role      string    `json:"role" db:"role"`
+type UserUnitAccess struct {
+	UserID uuid.UUID `json:"user_id" db:"user_id"`
+	UnitID uuid.UUID `json:"unit_id" db:"unit_id"`
+	Role   string    `json:"role" db:"role"`
 }

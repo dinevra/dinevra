@@ -19,20 +19,20 @@ var upgrader = websocket.Upgrader{
 }
 
 type Client struct {
-	Hub       *Hub
-	Conn      *websocket.Conn
-	Send      chan []byte
-	KitchenID uuid.UUID
-	DeviceID  uuid.UUID
+	Hub      *Hub
+	Conn     *websocket.Conn
+	Send     chan []byte
+	UnitID   uuid.UUID
+	DeviceID uuid.UUID
 }
 
 func ServeWs(hub *Hub, c *gin.Context) {
-	kitchenIDStr := c.Query("kitchen_id")
+	unitIDStr := c.Query("unit_id")
 	deviceIDStr := c.Query("device_id")
 
-	kitchenID, err := uuid.Parse(kitchenIDStr)
+	unitID, err := uuid.Parse(unitIDStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid kitchen_id"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid unit_id"})
 		return
 	}
 	deviceID, err := uuid.Parse(deviceIDStr)
@@ -48,11 +48,11 @@ func ServeWs(hub *Hub, c *gin.Context) {
 	}
 
 	client := &Client{
-		Hub:       hub,
-		Conn:      conn,
-		Send:      make(chan []byte, 256),
-		KitchenID: kitchenID,
-		DeviceID:  deviceID,
+		Hub:      hub,
+		Conn:     conn,
+		Send:     make(chan []byte, 256),
+		UnitID:   unitID,
+		DeviceID: deviceID,
 	}
 
 	client.Hub.Register <- client

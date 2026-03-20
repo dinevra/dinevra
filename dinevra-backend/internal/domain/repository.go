@@ -14,7 +14,7 @@ type UserRepository interface {
 
 type OrderRepository interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*Order, error)
-	GetByKitchenID(ctx context.Context, kitchenID uuid.UUID) ([]*Order, error)
+	GetByUnitID(ctx context.Context, unitID uuid.UUID) ([]*Order, error)
 	Create(ctx context.Context, order *Order) error
 	UpdateStatus(ctx context.Context, id uuid.UUID, status string) error
 }
@@ -22,5 +22,5 @@ type OrderRepository interface {
 type DeviceRepository interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*Device, error)
 	Create(ctx context.Context, device *Device) error
-	UpdateCurrentKitchen(ctx context.Context, id uuid.UUID, kitchenID uuid.UUID) error
+	UpdateCurrentUnit(ctx context.Context, id uuid.UUID, unitID uuid.UUID) error
 }

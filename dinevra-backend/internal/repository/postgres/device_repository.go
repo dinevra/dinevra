@@ -17,11 +17,11 @@ func NewDeviceRepository(pool *pgxpool.Pool) domain.DeviceRepository {
 }
 
 func (r *deviceRepository) GetByID(ctx context.Context, id uuid.UUID) (*domain.Device, error) {
-	query := `SELECT id, org_id, mode, fixed_kitchen_id, current_kitchen_id, status, created_at FROM devices WHERE id = $1`
+	query := `SELECT id, org_id, mode, fixed_unit_id, current_unit_id, status, created_at FROM devices WHERE id = $1`
 	var dev domain.Device
 	err := r.pool.QueryRow(ctx, query, id).Scan(
-		&dev.ID, &dev.OrganizationID, &dev.Mode, &dev.FixedKitchenID,
-		&dev.CurrentKitchenID, &dev.Status, &dev.CreatedAt,
+		&dev.ID, &dev.OrganizationID, &dev.Mode, &dev.FixedUnitID,
+		&dev.CurrentUnitID, &dev.Status, &dev.CreatedAt,
 	)
 	if err != nil {
 		return nil, err
@@ -30,14 +30,14 @@ func (r *deviceRepository) GetByID(ctx context.Context, id uuid.UUID) (*domain.D
 }
 
 func (r *deviceRepository) Create(ctx context.Context, device *domain.Device) error {
-	query := `INSERT INTO devices (id, org_id, mode, fixed_kitchen_id, current_kitchen_id, status, created_at)
+	query := `INSERT INTO devices (id, org_id, mode, fixed_unit_id, current_unit_id, status, created_at)
 			  VALUES ($1, $2, $3, $4, $5, $6, $7)`
-	_, err := r.pool.Exec(ctx, query, device.ID, device.OrganizationID, device.Mode, device.FixedKitchenID, device.CurrentKitchenID, device.Status, device.CreatedAt)
+	_, err := r.pool.Exec(ctx, query, device.ID, device.OrganizationID, device.Mode, device.FixedUnitID, device.CurrentUnitID, device.Status, device.CreatedAt)
 	return err
 }
 
-func (r *deviceRepository) UpdateCurrentKitchen(ctx context.Context, id uuid.UUID, kitchenID uuid.UUID) error {
-	query := `UPDATE devices SET current_kitchen_id = $1 WHERE id = $2`
-	_, err := r.pool.Exec(ctx, query, kitchenID, id)
+func (r *deviceRepository) UpdateCurrentUnit(ctx context.Context, id uuid.UUID, unitID uuid.UUID) error {
+	query := `UPDATE devices SET current_unit_id = $1 WHERE id = $2`
+	_, err := r.pool.Exec(ctx, query, unitID, id)
 	return err
 }
