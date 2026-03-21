@@ -56,3 +56,4 @@ GO/
 .env.*.local
 *.pem
 terraform/*.pem
+api-linux

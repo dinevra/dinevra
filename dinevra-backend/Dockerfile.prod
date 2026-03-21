@@ -1,0 +1,7 @@
+FROM alpine:latest
+RUN apk --no-cache add ca-certificates
+WORKDIR /root/
+# Copy the pre-built linux binary
+COPY api-linux ./api
+EXPOSE 8080
+CMD ["./api"]
