@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 export default function Signup() {
   const [organization, setOrganization] = useState('');
   const [sector, setSector] = useState('RESTAURANT');
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -32,6 +33,7 @@ export default function Signup() {
         body: JSON.stringify({
           organization_name: organization,
           facility_type: sector,
+          name,
           email,
           password,
         }),
@@ -113,6 +115,18 @@ export default function Signup() {
                 <option value="GYM">Gym &amp; Fitness</option>
                 <option value="CORPORATE">Corporate Office</option>
               </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Administrator Name</label>
+              <input
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="block w-full px-4 py-3 bg-gray-100 border border-transparent rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 sm:text-sm font-medium transition-colors"
+                placeholder="John Doe"
+              />
             </div>
 
             <div>

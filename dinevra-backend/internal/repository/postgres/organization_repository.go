@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"errors"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -40,6 +39,3 @@ func (r *organizationRepository) GetByID(ctx context.Context, id uuid.UUID) (*do
 	}
 	return &org, nil
 }
-
-// Ensure compile (unused field suppression)
-var _ = time.Now

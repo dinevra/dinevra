@@ -53,11 +53,13 @@ func (u *authUsecase) Signup(ctx context.Context, req *domain.SignupRequest) (*d
 		return nil, err
 	}
 
-	// Create user
+	// Create user — first user is admin
 	user := &domain.User{
 		ID:             uuid.New(),
 		OrganizationID: org.ID,
 		Email:          req.Email,
+		Name:           req.Name,
+		Role:           "admin",
 		PasswordHash:   string(hash),
 		CreatedAt:      time.Now(),
 	}
@@ -86,6 +88,9 @@ func (u *authUsecase) Login(ctx context.Context, req *domain.LoginRequest) (*dom
 		return nil, errors.New("invalid credentials")
 	}
 
+	// Record last login time (non-blocking — ignore error)
+	_ = u.userRepo.UpdateLastLogin(ctx, user.ID)
+
 	token, err := generateToken(user)
 	if err != nil {
 		return nil, err
@@ -104,6 +109,8 @@ func generateToken(user *domain.User) (string, error) {
 		"sub":    user.ID.String(),
 		"org_id": user.OrganizationID.String(),
 		"email":  user.Email,
+		"name":   user.Name,
+		"role":   user.Role,
 		"exp":    time.Now().Add(7 * 24 * time.Hour).Unix(),
 		"iat":    time.Now().Unix(),
 	}
