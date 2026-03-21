@@ -24,4 +24,4 @@ jobs:
 
     - name: Run Tests
       working-directory: ./dinevra-backend
-      run: go test -v ./... -cover
+      run: go test -v ./...
