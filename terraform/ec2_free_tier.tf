@@ -44,6 +44,7 @@ resource "aws_instance" "dinevra_mvp_backend" {
   ami           = "ami-0c7217cdde317cfec" # Canonical Ubuntu 22.04 LTS (HVM), SSD Volume Type in us-east-1
   instance_type = "t2.micro"              # Eligible for AWS Free Tier
 
+  iam_instance_profile   = aws_iam_instance_profile.dinevra_ec2_profile.name
   vpc_security_group_ids = [aws_security_group.dinevra_ec2_sg.id]
   key_name               = "dinevra-keypair" # Assume user creates an SSH key pair
 
@@ -54,6 +55,33 @@ resource "aws_instance" "dinevra_mvp_backend" {
   }
 }
 
+# IAM Role for EC2 to allow SSM
+resource "aws_iam_role" "dinevra_ec2_role" {
+  name = "dinevra_ec2_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_instance_profile" "dinevra_ec2_profile" {
+  name = "dinevra_ec2_profile"
+  role = aws_iam_role.dinevra_ec2_role.name
+}
+
 output "backend_public_ip" {
   value = aws_instance.dinevra_mvp_backend.public_ip
+}
+
+output "backend_instance_id" {
+  value = aws_instance.dinevra_mvp_backend.id
 }
