@@ -20,7 +20,7 @@ resource "aws_iam_role" "github_deployment_role" {
         }
         Condition = {
           StringLike = {
-            "token.actions.githubusercontent.com:sub" : "repo:ricky28chd/dinevra:*"
+            "token.actions.githubusercontent.com:sub" : "repo:dinevra/dinevra:*"
           }
         }
       }
