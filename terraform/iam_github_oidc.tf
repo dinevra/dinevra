@@ -79,7 +79,7 @@ resource "aws_iam_role_policy" "ssm_deploy_policy" {
 # Attach SSM Managed Policy to the EC2 Instance Profile (Role)
 # This allows the EC2 instance to be managed by Systems Manager
 resource "aws_iam_role_policy_attachment" "ec2_ssm_attachment" {
-  role       = "dinevra_ec2_role" # Defined in your existing ec2_free_tier.tf
+  role       = aws_iam_role.dinevra_ec2_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
