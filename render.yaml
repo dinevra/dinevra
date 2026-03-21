@@ -33,6 +33,8 @@ services:
         value: 8080
       - key: STRIPE_SECRET_KEY
         value: sk_test_placeholder
+      - key: JWT_SECRET
+        value: K8lgu42mXy8CwHBwSMkl4qtVsgLtDYIaciCQvScedf+L30RzwdY1hWvbxK+3CIMAmUd1UbExWVyShXTTCBda3w==
 
   # 4. React Static Frontend
   - type: web
@@ -48,7 +50,6 @@ services:
           name: dinevra-backend
           type: web
           envVarKey: RENDER_EXTERNAL_URL
-          # Note: We append /api/v1 to the generated URL
     routes:
       - type: rewrite
         source: /*
