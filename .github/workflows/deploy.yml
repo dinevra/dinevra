@@ -123,12 +123,10 @@ jobs:
             --parameters "commands=[
               'mkdir -p /app/dinevra',
               'cd /app/dinevra',
-              'echo \"POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}\" > .env.prod',
-              'echo \"STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}\" >> .env.prod',
-              'echo \"JWT_SECRET=${{ secrets.JWT_SECRET }}\" >> .env.prod',
+              'printf \"POSTGRES_PASSWORD=%s\nSTRIPE_SECRET_KEY=%s\nJWT_SECRET=%s\n\" \"${{ secrets.POSTGRES_PASSWORD }}\" \"${{ secrets.STRIPE_SECRET_KEY }}\" \"${{ secrets.JWT_SECRET }}\" > .env.prod',
               'echo \"${{ secrets.GITHUB_TOKEN }}\" | sudo docker login ghcr.io -u ${{ github.actor }} --password-stdin',
               'sudo docker compose -f docker-compose.prod.yml --env-file .env.prod pull api',
-              'sudo docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --no-deps api',
+              'sudo docker compose -f docker-compose.prod.yml --env-file .env.prod up -d api',
               'sudo docker image prune -f'
             ]" \
             --region us-east-1
