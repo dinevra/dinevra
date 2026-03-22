@@ -22,3 +22,8 @@ variable "marketing_domain_name" {
   description = "Domain name for the marketing website"
   default     = "www.dinevra.com"
 }
+variable "root_domain_name" {
+  type        = string
+  description = "Root domain name for redirection"
+  default     = "dinevra.com"
+}

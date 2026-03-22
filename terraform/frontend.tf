@@ -92,3 +92,31 @@ resource "aws_s3_bucket_policy" "marketing_policy" {
 output "marketing_s3_website_url" {
   value = aws_s3_bucket_website_configuration.marketing_website.website_endpoint
 }
+# --- ROOT DOMAIN REDIRECT BUCKET (dinevra.com -> www) ---
+
+resource "aws_s3_bucket" "root_bucket" {
+  bucket = var.root_domain_name
+  force_destroy = true
+}
+
+resource "aws_s3_bucket_website_configuration" "root_website" {
+  bucket = aws_s3_bucket.root_bucket.id
+
+  redirect_all_requests_to {
+    host_name = var.marketing_domain_name
+    protocol  = "http"
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "root_access" {
+  bucket = aws_s3_bucket.root_bucket.id
+
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
+}
+
+output "root_s3_website_url" {
+  value = aws_s3_bucket_website_configuration.root_website.website_endpoint
+}
