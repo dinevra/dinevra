@@ -78,8 +78,13 @@ resource "aws_iam_instance_profile" "dinevra_ec2_profile" {
   role = aws_iam_role.dinevra_ec2_role.name
 }
 
+resource "aws_eip" "backend_eip" {
+  instance = aws_instance.dinevra_mvp_backend.id
+  domain   = "vpc"
+}
+
 output "backend_public_ip" {
-  value = aws_instance.dinevra_mvp_backend.public_ip
+  value = aws_eip.backend_eip.public_ip
 }
 
 output "backend_instance_id" {

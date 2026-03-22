@@ -50,6 +50,8 @@ jobs:
 
       - name: Build Dashboard
         working-directory: ./dinevra-dashboard
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
         run: npm run build
 
       - name: Configure AWS Credentials (OIDC)
