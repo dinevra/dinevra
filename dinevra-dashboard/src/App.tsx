@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './apps/auth/AuthContext';
 import Login from './apps/auth/Login';
 import Signup from './apps/auth/Signup';
@@ -27,6 +28,7 @@ function ProtectedRoute({ children }: { children: JSX.Element }) {
 function App() {
   return (
     <AuthProvider>
+      <Toaster position="top-right" reverseOrder={false} />
       <Router>
       <Routes>
         {/* Public Application Landing Page */}

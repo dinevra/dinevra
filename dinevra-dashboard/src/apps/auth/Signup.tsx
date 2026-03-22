@@ -10,6 +10,7 @@ export default function Signup() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [agreed, setAgreed] = useState(false);
+  const [showValidation, setShowValidation] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -20,7 +21,8 @@ export default function Signup() {
       return;
     }
     if (!agreed) {
-      toast.error('You must agree to the Terms of Service.');
+      setShowValidation(true);
+      toast.error('Please agree to the Terms of Service to continue.');
       return;
     }
     setIsLoading(true);
@@ -182,20 +184,28 @@ export default function Signup() {
             </div>
 
             {/* Legal Agreement */}
-            <div className="pt-4 flex items-start gap-3">
-              <input
-                id="terms"
-                type="checkbox"
-                checked={agreed}
-                onChange={(e) => setAgreed(e.target.checked)}
-                className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
-              />
-              <label htmlFor="terms" className="text-xs text-gray-500 leading-tight cursor-pointer">
-                I agree to the Dinevra{' '}
-                <a href="#" className="text-blue-600 underline font-semibold hover:text-blue-800">Terms of Service</a>
-                {' '}and{' '}
-                <a href="#" className="text-blue-600 underline font-semibold hover:text-blue-800">Privacy Policy</a>.
-              </label>
+            <div className={`pt-4 rounded-lg transition-all ${showValidation && !agreed ? 'bg-red-50 p-3 ring-1 ring-red-200' : ''}`}>
+              <div className="flex items-start gap-3">
+                <input
+                  id="terms"
+                  type="checkbox"
+                  checked={agreed}
+                  onChange={(e) => {
+                    setAgreed(e.target.checked);
+                    if (e.target.checked) setShowValidation(false);
+                  }}
+                  className={`mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer ${showValidation && !agreed ? 'border-red-400' : ''}`}
+                />
+                <label htmlFor="terms" className="text-xs text-gray-500 leading-tight cursor-pointer">
+                  I agree to the Dinevra{' '}
+                  <a href="#" className="text-blue-600 underline font-semibold hover:text-blue-800">Terms of Service</a>
+                  {' '}and{' '}
+                  <a href="#" className="text-blue-600 underline font-semibold hover:text-blue-800">Privacy Policy</a>.
+                </label>
+              </div>
+              {showValidation && !agreed && (
+                <p className="mt-2 text-[10px] font-bold text-red-600 uppercase tracking-wider">Required</p>
+              )}
             </div>
           </form>
         </div>
