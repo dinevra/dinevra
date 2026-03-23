@@ -10,8 +10,13 @@ import AdminLayout from './apps/admin/AdminLayout';
 import Overview from './apps/admin/Overview';
 import Kitchens from './apps/admin/Kitchens';
 import Settings from './apps/admin/Settings';
+import LocationsList from './apps/admin/locations/LocationsList';
 import AddLocation from './apps/admin/locations/AddLocation';
+import LocationDetails from './apps/admin/locations/LocationDetails';
+import EditLocation from './apps/admin/locations/EditLocation';
 import AddKitchen from './apps/admin/kitchens/AddKitchen';
+import EditKitchen from './apps/admin/kitchens/EditKitchen';
+import KitchenDetails from './apps/admin/kitchens/KitchenDetails';
 import KitchenConfigWrapper from './apps/admin/kitchens/KitchenConfigWrapper';
 import PosLayout from './apps/pos/PosLayout';
 import PosTerminal from './apps/pos/PosTerminal';
@@ -55,8 +60,13 @@ function App() {
         >
           <Route index element={<Overview />} />
           <Route path="kitchens" element={<Kitchens />} />
+          <Route path="locations" element={<LocationsList />} />
           <Route path="locations/new" element={<AddLocation />} />
+          <Route path="locations/:locationId" element={<LocationDetails />} />
+          <Route path="locations/:locationId/edit" element={<EditLocation />} />
           <Route path="locations/:locationId/kitchens/new" element={<AddKitchen />} />
+          <Route path="kitchens/:kitchenId" element={<KitchenDetails />} />
+          <Route path="kitchens/:kitchenId/edit" element={<EditKitchen />} />
           <Route path="kitchens/:kitchenId/config" element={<KitchenConfigWrapper />} />
           <Route path="menu" element={<div className="p-8">Menu Builder</div>} />
           <Route path="devices" element={<div className="p-8">Devices & POS</div>} />

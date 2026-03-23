@@ -48,7 +48,7 @@ func main() {
 	paymentUsecase := usecase.NewPaymentUsecase(orderRepo, broadcaster)
 	authUsecase := usecase.NewAuthUsecase(userRepo, orgRepo)
 	locUsecase := usecase.NewLocationUsecase(locRepo)
-	kitchenUsecase := usecase.NewKitchenUsecase(kitchenRepo)
+	kitchenUsecase := usecase.NewKitchenUsecase(kitchenRepo, locRepo)
 
 	// Router
 	router := gin.Default()

@@ -12,15 +12,20 @@ export interface FormField {
 interface DynamicFormProps {
   fields: FormField[];
   submitLabel?: string;
-  onSubmit: (data: Record<string, string>) => void;
+  onSubmit: (data: Record<string, any>) => void;
   isLoading?: boolean;
 }
 
 export default function DynamicForm({ fields, submitLabel = 'Submit', onSubmit, isLoading }: DynamicFormProps) {
-  const [formData, setFormData] = useState<Record<string, string>>({});
+  const [formData, setFormData] = useState<Record<string, any>>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value, type } = e.target;
+    let val: any = value;
+    if (type === 'number') {
+      val = value ? parseFloat(value) : 0;
+    }
+    setFormData(prev => ({ ...prev, [name]: val }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {

@@ -60,7 +60,7 @@ type KitchenTimingSlot struct {
 
 // CreateKitchenRequest validates exact payload for assigning kitchens to locations
 type CreateKitchenRequest struct {
-	LocationID               uuid.UUID `json:"location_id" binding:"required"`
+	LocationID               uuid.UUID `json:"location_id"`
 	Name                     string    `json:"name" binding:"required"`
 	Code                     string    `json:"code"`
 	DisplayName              string    `json:"display_name"`

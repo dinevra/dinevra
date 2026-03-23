@@ -35,12 +35,19 @@ type LocationRepository interface {
 	Create(ctx context.Context, location *Location) error
 	GetByID(ctx context.Context, id uuid.UUID) (*Location, error)
 	GetByOrganizationID(ctx context.Context, orgID uuid.UUID) ([]*Location, error)
+	Update(ctx context.Context, location *Location) error
+	Delete(ctx context.Context, id uuid.UUID) error
+	List(ctx context.Context, orgID uuid.UUID, country, city, status string) ([]*Location, error)
+	GetByCode(ctx context.Context, orgID uuid.UUID, code string) (*Location, error)
 }
 
 type KitchenRepository interface {
 	Create(ctx context.Context, kitchen *Kitchen) error
 	GetByID(ctx context.Context, id uuid.UUID) (*Kitchen, error)
 	GetByLocationID(ctx context.Context, locationID uuid.UUID) ([]*Kitchen, error)
+	Update(ctx context.Context, kitchen *Kitchen) error
+	Delete(ctx context.Context, id uuid.UUID) error
+	GetByCode(ctx context.Context, locationID uuid.UUID, code string) (*Kitchen, error)
 	UpdateConfiguration(ctx context.Context, config *KitchenConfiguration) error
 	UpdateStatus(ctx context.Context, kitchenID uuid.UUID, isOpen bool) error
 }

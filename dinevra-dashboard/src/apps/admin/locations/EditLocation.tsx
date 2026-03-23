@@ -1,25 +1,30 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import PageHeader from '../../../shared/ui/PageHeader';
 import SectionedForm, { FormSection } from '../../../shared/ui/SectionedForm';
-import { locationsApi, CreateLocationRequest } from '../../../features/locations/locationsApi';
+import { locationsApi, Location } from '../../../features/locations/locationsApi';
 import { toast } from 'react-hot-toast';
-import { useAuth } from '../../auth/AuthContext';
-import { jwtDecode } from 'jwt-decode';
 
-export default function AddLocation() {
+export default function EditLocation() {
+  const { locationId } = useParams<{ locationId: string }>();
   const navigate = useNavigate();
-  const { token } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
+  const [location, setLocation] = useState<Location | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
-  // Extract org_id from token
-  const getOrgId = () => {
-    if (!token) return '';
+  useEffect(() => {
+    if (locationId) fetchLocation();
+  }, [locationId]);
+
+  const fetchLocation = async () => {
     try {
-      const decoded: any = jwtDecode(token);
-      return decoded.org_id || '';
+      const data = await locationsApi.getById(locationId!);
+      setLocation(data);
     } catch (e) {
-      return '';
+      toast.error('Failed to load location');
+      navigate('/admin/locations');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -27,8 +32,8 @@ export default function AddLocation() {
     {
       title: '1. Basic Information',
       fields: [
-        { name: 'name', label: 'Location Name', type: 'text', required: true, placeholder: 'e.g. Downtown Hub' },
-        { name: 'code', label: 'Location Code', type: 'text', required: true, placeholder: 'e.g. DT-01' },
+        { name: 'name', label: 'Location Name', type: 'text', required: true },
+        { name: 'code', label: 'Location Code', type: 'text', required: true },
         { name: 'type', label: 'Location Type', type: 'select', options: [
           { label: 'Restaurant', value: 'RESTAURANT' },
           { label: 'Campus Dining', value: 'CAMPUS' },
@@ -36,7 +41,7 @@ export default function AddLocation() {
           { label: 'Gym/Service Point', value: 'GYM' },
           { label: 'Corporate Hub', value: 'CORPORATE' },
         ]},
-        { name: 'status', label: 'Initial Status', type: 'select', options: [
+        { name: 'status', label: 'Status', type: 'select', options: [
           { label: 'Active', value: 'active' },
           { label: 'Inactive', value: 'inactive' },
         ]},
@@ -65,7 +70,7 @@ export default function AddLocation() {
           { label: 'Europe/London', value: 'Europe/London' },
           { label: 'Asia/Kolkata', value: 'Asia/Kolkata' },
         ]},
-        { name: 'currency', label: 'Primary Currency', type: 'text', placeholder: 'USD, EUR, INR' },
+        { name: 'currency', label: 'Primary Currency', type: 'text' },
         { name: 'date_format', label: 'Date Format', type: 'select', options: [
           { label: 'DD/MM/YYYY', value: 'DD/MM/YYYY' },
           { label: 'MM/DD/YYYY', value: 'MM/DD/YYYY' },
@@ -93,59 +98,65 @@ export default function AddLocation() {
     {
       title: '5. Operational Settings',
       fields: [
-        { name: 'supports_pickup', label: 'Pickup', type: 'checkbox', placeholder: 'Support Pickup' },
-        { name: 'supports_delivery', label: 'Delivery', type: 'checkbox', placeholder: 'Support Delivery' },
-        { name: 'supports_dine_in', label: 'Dine-In', type: 'checkbox', placeholder: 'Support Dine-In' },
-        { name: 'supports_pre_order', label: 'Pre-Order', type: 'checkbox', placeholder: 'Support Pre-Order' },
-        { name: 'supports_same_day_ordering', label: 'Same-Day Ordering', type: 'checkbox', placeholder: 'Support Same-Day' },
+        { name: 'supports_pickup', label: 'Pickup', type: 'checkbox' },
+        { name: 'supports_delivery', label: 'Delivery', type: 'checkbox' },
+        { name: 'supports_dine_in', label: 'Dine-In', type: 'checkbox' },
+        { name: 'supports_pre_order', label: 'Pre-Order', type: 'checkbox' },
+        { name: 'supports_same_day_ordering', label: 'Same-Day Ordering', type: 'checkbox' },
         { name: 'tax_region', label: 'Tax Region', type: 'text' },
       ]
     }
   ];
 
   const handleSubmit = async (formData: any) => {
-    setIsLoading(true);
+    setIsSaving(true);
     try {
-      const org_id = getOrgId();
-      if (!org_id) throw new Error('Organization ID not found in session');
-
-      const payload: CreateLocationRequest = {
+      const payload = {
         ...formData,
-        organization_id: org_id,
-        // Convert numbers
         week_start_day: formData.week_start_day ? parseInt(formData.week_start_day) : undefined,
         latitude: formData.latitude ? parseFloat(formData.latitude) : undefined,
         longitude: formData.longitude ? parseFloat(formData.longitude) : undefined,
       };
-
-      const newLoc = await locationsApi.create(payload);
-      toast.success('Location created successfully');
-      navigate(`/admin/locations/${newLoc.id}`);
+      await locationsApi.update(locationId!, payload);
+      toast.success('Location updated successfully');
+      navigate(`/admin/locations/${locationId}`);
     } catch (e: any) {
-      toast.error(e.response?.data?.error || e.message || 'Failed to create location');
+      toast.error(e.response?.data?.error || 'Failed to update location');
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
+  };
+
+  if (isLoading) return <div className="p-8">Loading...</div>;
+
+  const initialData = {
+    ...location,
+    opening_date: location?.opening_date ? new Date(location.opening_date).toISOString().split('T')[0] : '',
+    week_start_day: location?.week_start_day?.toString(),
+    latitude: location?.latitude?.toString(),
+    longitude: location?.longitude?.toString(),
   };
 
   return (
     <div className="p-8 max-w-4xl mx-auto h-full overflow-y-auto">
       <PageHeader 
-        title="Create New Location" 
-        description="Establish a new regional entity for your organization."
+        title={`Edit ${location?.name}`} 
+        description="Update the operational and regional settings for this location."
         breadcrumbs={[
           { label: 'Admin', onClick: () => navigate('/admin') },
           { label: 'Locations', onClick: () => navigate('/admin/locations') },
-          { label: 'New Location' }
+          { label: location?.name || '...', onClick: () => navigate(`/admin/locations/${location?.id}`) },
+          { label: 'Edit' }
         ]}
       />
       <div className="mt-8">
         <SectionedForm 
           sections={sections} 
+          initialData={initialData}
           onSubmit={handleSubmit} 
-          isLoading={isLoading} 
-          submitLabel="Create Location"
-          onCancel={() => navigate('/admin/locations')}
+          isLoading={isSaving} 
+          submitLabel="Update Location"
+          onCancel={() => navigate(`/admin/locations/${locationId}`)}
         />
       </div>
     </div>
