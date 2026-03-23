@@ -16,6 +16,7 @@ func NewAuthHandler(rg *gin.RouterGroup, authUsecase domain.AuthUsecase) {
 	auth := rg.Group("/auth")
 	auth.POST("/signup", h.Signup)
 	auth.POST("/login", h.Login)
+	auth.POST("/kitchen-login", h.KitchenLogin)
 }
 
 func (h *AuthHandler) Signup(c *gin.Context) {
@@ -48,6 +49,22 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	resp, err := h.authUsecase.Login(c.Request.Context(), &req)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid email or password"})
+		return
+	}
+
+	c.JSON(http.StatusOK, resp)
+}
+
+func (h *AuthHandler) KitchenLogin(c *gin.Context) {
+	var req domain.KitchenLoginRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	resp, err := h.authUsecase.KitchenLogin(c.Request.Context(), &req)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid kitchen credentials"})
 		return
 	}
 

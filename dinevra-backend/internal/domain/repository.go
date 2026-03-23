@@ -30,3 +30,17 @@ type OrganizationRepository interface {
 	Create(ctx context.Context, org *Organization) error
 	GetByID(ctx context.Context, id uuid.UUID) (*Organization, error)
 }
+
+type LocationRepository interface {
+	Create(ctx context.Context, location *Location) error
+	GetByID(ctx context.Context, id uuid.UUID) (*Location, error)
+	GetByOrganizationID(ctx context.Context, orgID uuid.UUID) ([]*Location, error)
+}
+
+type KitchenRepository interface {
+	Create(ctx context.Context, kitchen *Kitchen) error
+	GetByID(ctx context.Context, id uuid.UUID) (*Kitchen, error)
+	GetByLocationID(ctx context.Context, locationID uuid.UUID) ([]*Kitchen, error)
+	UpdateConfiguration(ctx context.Context, config *KitchenConfiguration) error
+	UpdateStatus(ctx context.Context, kitchenID uuid.UUID, isOpen bool) error
+}

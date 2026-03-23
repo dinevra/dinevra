@@ -20,7 +20,14 @@ type AuthResponse struct {
 	User  *User  `json:"user"`
 }
 
+type KitchenLoginRequest struct {
+	KitchenID string `json:"kitchen_id" binding:"required"`
+	Email     string `json:"email" binding:"required,email"`
+	Password  string `json:"password" binding:"required"`
+}
+
 type AuthUsecase interface {
 	Signup(ctx context.Context, req *SignupRequest) (*AuthResponse, error)
 	Login(ctx context.Context, req *LoginRequest) (*AuthResponse, error)
+	KitchenLogin(ctx context.Context, req *KitchenLoginRequest) (*AuthResponse, error)
 }

@@ -1,0 +1,4 @@
+ALTER TABLE kitchens
+DROP CONSTRAINT IF EXISTS fk_kitchens_location;
+
+DROP TABLE IF EXISTS locations CASCADE;

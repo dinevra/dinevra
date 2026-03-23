@@ -40,11 +40,15 @@ func main() {
 	orderRepo := postgres.NewOrderRepository(pool)
 	userRepo := postgres.NewUserRepository(pool)
 	orgRepo := postgres.NewOrganizationRepository(pool)
+	locRepo := postgres.NewLocationRepository(pool)
+	kitchenRepo := postgres.NewKitchenRepository(pool)
 
 	// Usecases
 	orderUsecase := usecase.NewOrderUsecase(orderRepo, broadcaster)
 	paymentUsecase := usecase.NewPaymentUsecase(orderRepo, broadcaster)
 	authUsecase := usecase.NewAuthUsecase(userRepo, orgRepo)
+	locUsecase := usecase.NewLocationUsecase(locRepo)
+	kitchenUsecase := usecase.NewKitchenUsecase(kitchenRepo)
 
 	// Router
 	router := gin.Default()
@@ -72,6 +76,8 @@ func main() {
 	delivery_http.NewOrderHandler(apiV1, orderUsecase)
 	delivery_http.NewPaymentHandler(apiV1, paymentUsecase)
 	delivery_http.NewAuthHandler(apiV1, authUsecase)
+	delivery_http.NewLocationHandler(apiV1, locUsecase)
+	delivery_http.NewKitchenHandler(apiV1, kitchenUsecase)
 
 	// WebSocket
 	router.GET("/ws", func(c *gin.Context) {

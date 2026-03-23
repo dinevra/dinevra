@@ -118,3 +118,47 @@ func generateToken(user *domain.User) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(secret))
 }
+
+func (u *authUsecase) KitchenLogin(ctx context.Context, req *domain.KitchenLoginRequest) (*domain.AuthResponse, error) {
+	user, err := u.userRepo.GetByEmail(ctx, req.Email)
+	if err != nil {
+		return nil, err
+	}
+	if user == nil {
+		return nil, errors.New("invalid credentials")
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)); err != nil {
+		return nil, errors.New("invalid credentials")
+	}
+
+	_ = u.userRepo.UpdateLastLogin(ctx, user.ID)
+
+	token, err := generateKitchenToken(user, req.KitchenID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &domain.AuthResponse{Token: token, User: user}, nil
+}
+
+func generateKitchenToken(user *domain.User, kitchenID string) (string, error) {
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		secret = "dinevra-dev-secret-change-in-production"
+	}
+
+	claims := jwt.MapClaims{
+		"sub":        user.ID.String(),
+		"org_id":     user.OrganizationID.String(),
+		"kitchen_id": kitchenID,
+		"email":      user.Email,
+		"name":       user.Name,
+		"role":       "kitchen_staff",
+		"exp":        time.Now().Add(7 * 24 * time.Hour).Unix(),
+		"iat":        time.Now().Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte(secret))
+}
