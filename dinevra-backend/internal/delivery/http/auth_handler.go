@@ -31,7 +31,7 @@ func (h *AuthHandler) Signup(c *gin.Context) {
 			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "signup failed"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "signup failed: " + err.Error()})
 		return
 	}
 
