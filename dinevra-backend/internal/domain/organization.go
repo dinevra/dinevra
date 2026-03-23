@@ -21,10 +21,4 @@ type Location struct {
 	CreatedAt      time.Time `json:"created_at" db:"created_at"`
 }
 
-type Unit struct {
-	ID         uuid.UUID `json:"id" db:"id"`
-	LocationID uuid.UUID `json:"location_id" db:"location_id"`
-	Name       string    `json:"name" db:"name"`
-	Type       string    `json:"type" db:"type"` // 'KITCHEN', 'BAR', 'RECEPTION', 'PHARMACY', etc.
-	CreatedAt  time.Time `json:"created_at" db:"created_at"`
-}
+

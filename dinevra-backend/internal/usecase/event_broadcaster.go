@@ -7,6 +7,6 @@ import (
 )
 
 type EventBroadcaster interface {
-	BroadcastOrderCreated(ctx context.Context, unitID uuid.UUID, orderID uuid.UUID) error
-	BroadcastOrderStatusUpdated(ctx context.Context, unitID uuid.UUID, orderID uuid.UUID, status string) error
+	BroadcastOrderCreated(ctx context.Context, kitchenID uuid.UUID, orderID uuid.UUID) error
+	BroadcastOrderStatusUpdated(ctx context.Context, kitchenID uuid.UUID, orderID uuid.UUID, status string) error
 }

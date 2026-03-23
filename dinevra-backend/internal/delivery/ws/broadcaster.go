@@ -16,17 +16,17 @@ func NewRedisBroadcaster(hub *Hub) *RedisBroadcaster {
 	}
 }
 
-func (r *RedisBroadcaster) BroadcastOrderCreated(ctx context.Context, unitID uuid.UUID, orderID uuid.UUID) error {
+func (r *RedisBroadcaster) BroadcastOrderCreated(ctx context.Context, kitchenID uuid.UUID, orderID uuid.UUID) error {
 	payload := map[string]interface{}{
 		"order_id": orderID,
 	}
-	return r.hub.PublishEvent(ctx, unitID, "ORDER_CREATED", payload)
+	return r.hub.PublishEvent(ctx, kitchenID, "ORDER_CREATED", payload)
 }
 
-func (r *RedisBroadcaster) BroadcastOrderStatusUpdated(ctx context.Context, unitID uuid.UUID, orderID uuid.UUID, status string) error {
+func (r *RedisBroadcaster) BroadcastOrderStatusUpdated(ctx context.Context, kitchenID uuid.UUID, orderID uuid.UUID, status string) error {
 	payload := map[string]interface{}{
 		"order_id": orderID,
 		"status":   status,
 	}
-	return r.hub.PublishEvent(ctx, unitID, "ORDER_STATUS_UPDATED", payload)
+	return r.hub.PublishEvent(ctx, kitchenID, "ORDER_STATUS_UPDATED", payload)
 }

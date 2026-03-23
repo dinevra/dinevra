@@ -21,7 +21,7 @@ func NewOrderHandler(r *gin.RouterGroup, uc usecase.OrderUsecase) {
 	orderGrp := r.Group("/orders")
 	{
 		orderGrp.POST("", handler.CreateOrder)
-		orderGrp.GET("/unit/:unit_id", handler.GetOrdersByUnit)
+		orderGrp.GET("/kitchen/:kitchen_id", handler.GetOrdersByKitchen)
 		orderGrp.PATCH("/:id/advance", handler.AdvanceStatus)
 	}
 }
@@ -41,15 +41,15 @@ func (h *OrderHandler) CreateOrder(c *gin.Context) {
 	c.JSON(http.StatusCreated, order)
 }
 
-func (h *OrderHandler) GetOrdersByUnit(c *gin.Context) {
-	unitIDStr := c.Param("unit_id")
-	unitID, err := uuid.Parse(unitIDStr)
+func (h *OrderHandler) GetOrdersByKitchen(c *gin.Context) {
+	kitchenIDStr := c.Param("kitchen_id")
+	kitchenID, err := uuid.Parse(kitchenIDStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid unit id format"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid kitchen id format"})
 		return
 	}
 
-	orders, err := h.OrderUsecase.GetOrdersByUnit(c.Request.Context(), unitID)
+	orders, err := h.OrderUsecase.GetOrdersByKitchen(c.Request.Context(), kitchenID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

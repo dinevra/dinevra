@@ -22,7 +22,7 @@ func (m *MockOrderUsecase) CreateOrder(ctx context.Context, order *domain.Order)
 	return nil
 }
 
-func (m *MockOrderUsecase) GetOrdersByUnit(ctx context.Context, unitID uuid.UUID) ([]*domain.Order, error) {
+func (m *MockOrderUsecase) GetOrdersByKitchen(ctx context.Context, kitchenID uuid.UUID) ([]*domain.Order, error) {
 	return []*domain.Order{
 		{ID: uuid.New(), Status: "pending"},
 	}, nil
@@ -44,7 +44,7 @@ func TestCreateOrderHandler(t *testing.T) {
 	orderPayload := map[string]interface{}{
 		"organization_id": uuid.New().String(),
 		"location_id":     uuid.New().String(),
-		"unit_id":         uuid.New().String(),
+		"kitchen_id":      uuid.New().String(),
 		"device_id":       uuid.New().String(),
 		"employee_id":     uuid.New().String(),
 		"total_amount":    24.50,

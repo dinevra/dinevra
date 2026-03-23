@@ -17,7 +17,7 @@ func (m *mockOrderRepo) GetByID(ctx context.Context, id uuid.UUID) (*domain.Orde
 	return m.orders[id], nil
 }
 
-func (m *mockOrderRepo) GetByUnitID(ctx context.Context, unitID uuid.UUID) ([]*domain.Order, error) {
+func (m *mockOrderRepo) GetByKitchenID(ctx context.Context, kitchenID uuid.UUID) ([]*domain.Order, error) {
 	return nil, nil
 }
 
@@ -36,11 +36,11 @@ func (m *mockOrderRepo) UpdateStatus(ctx context.Context, id uuid.UUID, status s
 
 type mockBroadcaster struct{}
 
-func (m *mockBroadcaster) BroadcastOrderCreated(ctx context.Context, unitID uuid.UUID, orderID uuid.UUID) error {
+func (m *mockBroadcaster) BroadcastOrderCreated(ctx context.Context, kitchenID uuid.UUID, orderID uuid.UUID) error {
 	return nil
 }
 
-func (m *mockBroadcaster) BroadcastOrderStatusUpdated(ctx context.Context, unitID uuid.UUID, orderID uuid.UUID, status string) error {
+func (m *mockBroadcaster) BroadcastOrderStatusUpdated(ctx context.Context, kitchenID uuid.UUID, orderID uuid.UUID, status string) error {
 	return nil
 }
 
@@ -49,9 +49,9 @@ func TestOrderUsecase_CreateOrder(t *testing.T) {
 	broadcaster := &mockBroadcaster{}
 	uc := usecase.NewOrderUsecase(repo, broadcaster)
 
-	unitID := uuid.New()
+	kitchenID := uuid.New()
 	order := &domain.Order{
-		UnitID:      &unitID,
+		KitchenID:   &kitchenID,
 		TotalAmount: 15.50,
 	}
 

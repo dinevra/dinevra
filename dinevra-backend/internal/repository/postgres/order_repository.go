@@ -17,10 +17,10 @@ func NewOrderRepository(pool *pgxpool.Pool) domain.OrderRepository {
 }
 
 func (r *orderRepository) GetByID(ctx context.Context, id uuid.UUID) (*domain.Order, error) {
-	query := `SELECT id, unit_id, device_id, user_id, status, total_amount, created_at, updated_at FROM orders WHERE id = $1`
+	query := `SELECT id, kitchen_id, device_id, user_id, status, total_amount, created_at, updated_at FROM orders WHERE id = $1`
 	var order domain.Order
 	err := r.pool.QueryRow(ctx, query, id).Scan(
-		&order.ID, &order.UnitID, &order.DeviceID, &order.UserID,
+		&order.ID, &order.KitchenID, &order.DeviceID, &order.UserID,
 		&order.Status, &order.TotalAmount, &order.CreatedAt, &order.UpdatedAt,
 	)
 	if err != nil {
@@ -29,9 +29,9 @@ func (r *orderRepository) GetByID(ctx context.Context, id uuid.UUID) (*domain.Or
 	return &order, nil
 }
 
-func (r *orderRepository) GetByUnitID(ctx context.Context, unitID uuid.UUID) ([]*domain.Order, error) {
-	query := `SELECT id, unit_id, device_id, user_id, status, total_amount, created_at, updated_at FROM orders WHERE unit_id = $1 ORDER BY created_at DESC`
-	rows, err := r.pool.Query(ctx, query, unitID)
+func (r *orderRepository) GetByKitchenID(ctx context.Context, kitchenID uuid.UUID) ([]*domain.Order, error) {
+	query := `SELECT id, kitchen_id, device_id, user_id, status, total_amount, created_at, updated_at FROM orders WHERE kitchen_id = $1 ORDER BY created_at DESC`
+	rows, err := r.pool.Query(ctx, query, kitchenID)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (r *orderRepository) GetByUnitID(ctx context.Context, unitID uuid.UUID) ([]
 	for rows.Next() {
 		var o domain.Order
 		err := rows.Scan(
-			&o.ID, &o.UnitID, &o.DeviceID, &o.UserID,
+			&o.ID, &o.KitchenID, &o.DeviceID, &o.UserID,
 			&o.Status, &o.TotalAmount, &o.CreatedAt, &o.UpdatedAt,
 		)
 		if err != nil {
@@ -53,9 +53,9 @@ func (r *orderRepository) GetByUnitID(ctx context.Context, unitID uuid.UUID) ([]
 }
 
 func (r *orderRepository) Create(ctx context.Context, order *domain.Order) error {
-	query := `INSERT INTO orders (id, unit_id, device_id, user_id, status, total_amount, created_at, updated_at)
+	query := `INSERT INTO orders (id, kitchen_id, device_id, user_id, status, total_amount, created_at, updated_at)
 			  VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
-	_, err := r.pool.Exec(ctx, query, order.ID, order.UnitID, order.DeviceID, order.UserID, order.Status, order.TotalAmount, order.CreatedAt, order.UpdatedAt)
+	_, err := r.pool.Exec(ctx, query, order.ID, order.KitchenID, order.DeviceID, order.UserID, order.Status, order.TotalAmount, order.CreatedAt, order.UpdatedAt)
 	return err
 }
 

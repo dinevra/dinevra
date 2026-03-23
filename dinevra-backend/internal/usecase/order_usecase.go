@@ -11,7 +11,7 @@ import (
 
 type OrderUsecase interface {
 	CreateOrder(ctx context.Context, order *domain.Order) error
-	GetOrdersByUnit(ctx context.Context, unitID uuid.UUID) ([]*domain.Order, error)
+	GetOrdersByKitchen(ctx context.Context, kitchenID uuid.UUID) ([]*domain.Order, error)
 	AdvanceOrderStatus(ctx context.Context, orderID uuid.UUID) error
 }
 
@@ -43,14 +43,14 @@ func (u *orderUsecase) CreateOrder(ctx context.Context, order *domain.Order) err
 	}
 
 	// Broadcast the new order to KDS devices in real-time
-	if u.broadcaster != nil && order.UnitID != nil {
-		_ = u.broadcaster.BroadcastOrderCreated(ctx, *order.UnitID, order.ID)
+	if u.broadcaster != nil && order.KitchenID != nil {
+		_ = u.broadcaster.BroadcastOrderCreated(ctx, *order.KitchenID, order.ID)
 	}
 	return nil
 }
 
-func (u *orderUsecase) GetOrdersByUnit(ctx context.Context, unitID uuid.UUID) ([]*domain.Order, error) {
-	return u.orderRepo.GetByUnitID(ctx, unitID)
+func (u *orderUsecase) GetOrdersByKitchen(ctx context.Context, kitchenID uuid.UUID) ([]*domain.Order, error) {
+	return u.orderRepo.GetByKitchenID(ctx, kitchenID)
 }
 
 func (u *orderUsecase) AdvanceOrderStatus(ctx context.Context, orderID uuid.UUID) error {
@@ -78,8 +78,8 @@ func (u *orderUsecase) AdvanceOrderStatus(ctx context.Context, orderID uuid.UUID
 		return err
 	}
 
-	if u.broadcaster != nil && order.UnitID != nil {
-		_ = u.broadcaster.BroadcastOrderStatusUpdated(ctx, *order.UnitID, order.ID, nextStatus)
+	if u.broadcaster != nil && order.KitchenID != nil {
+		_ = u.broadcaster.BroadcastOrderStatusUpdated(ctx, *order.KitchenID, order.ID, nextStatus)
 	}
 	return nil
 }
