@@ -7,7 +7,7 @@ import { useAuth, FacilityType } from '../auth/AuthContext';
 const getNavItems = (type: FacilityType = 'RESTAURANT') => {
   const labels = {
     RESTAURANT: { units: 'Locations & Kitchens', menu: 'Menu Builder', pos: 'POS Devices', settings: 'Settings' },
-    CAMPUS: { units: 'Dining Halls & Units', menu: 'Meal Plans', pos: 'Service Terminals', settings: 'Campus Settings' },
+    CAMPUS: { units: 'Dining Halls & Kitchens', menu: 'Meal Plans', pos: 'Service Terminals', settings: 'Campus Settings' },
     HEALTHCARE: { units: 'Facilities & Pantries', menu: 'Dietary Manager', pos: 'Patient Terminals', settings: 'Healthcare Settings' },
     GYM: { units: 'Clubs & Juice Bars', menu: 'Pro-Shop Catalog', pos: 'Kiosks', settings: 'Club Settings' },
     CORPORATE: { units: 'Offices & Cafeterias', menu: 'Refreshment Manager', pos: 'Self-Service', settings: 'Office Settings' },
