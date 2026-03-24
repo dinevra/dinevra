@@ -16,7 +16,8 @@ type KitchenUsecase interface {
 	UpdateKitchen(ctx context.Context, id uuid.UUID, req *domain.UpdateKitchenRequest) (*domain.Kitchen, error)
 	DeleteKitchen(ctx context.Context, id uuid.UUID) error
 	UpdateKitchenConfig(ctx context.Context, config *domain.KitchenConfiguration) error
-	ToggleKitchenStatus(ctx context.Context, kitchenID uuid.UUID, isOpen bool) error
+	GetKitchenConfig(ctx context.Context, kitchenID uuid.UUID) (*domain.KitchenConfiguration, error)
+	ToggleKitchenStatus(ctx context.Context, kitchenID uuid.UUID, isOpen bool, reason *string, userID uuid.UUID) error
 }
 
 type kitchenUsecase struct {
@@ -219,6 +220,10 @@ func (u *kitchenUsecase) UpdateKitchenConfig(ctx context.Context, config *domain
 	return u.repo.UpdateConfiguration(ctx, config)
 }
 
-func (u *kitchenUsecase) ToggleKitchenStatus(ctx context.Context, kitchenID uuid.UUID, isOpen bool) error {
-	return u.repo.UpdateStatus(ctx, kitchenID, isOpen)
+func (u *kitchenUsecase) GetKitchenConfig(ctx context.Context, kitchenID uuid.UUID) (*domain.KitchenConfiguration, error) {
+	return u.repo.GetConfiguration(ctx, kitchenID)
+}
+
+func (u *kitchenUsecase) ToggleKitchenStatus(ctx context.Context, kitchenID uuid.UUID, isOpen bool, reason *string, userID uuid.UUID) error {
+	return u.repo.UpdateStatus(ctx, kitchenID, isOpen, reason, userID)
 }

@@ -48,6 +48,9 @@ type KitchenRepository interface {
 	Update(ctx context.Context, kitchen *Kitchen) error
 	Delete(ctx context.Context, id uuid.UUID) error
 	GetByCode(ctx context.Context, locationID uuid.UUID, code string) (*Kitchen, error)
+	
+	// Configuration
 	UpdateConfiguration(ctx context.Context, config *KitchenConfiguration) error
-	UpdateStatus(ctx context.Context, kitchenID uuid.UUID, isOpen bool) error
+	GetConfiguration(ctx context.Context, kitchenID uuid.UUID) (*KitchenConfiguration, error)
+	UpdateStatus(ctx context.Context, kitchenID uuid.UUID, isOpen bool, reason *string, changedBy uuid.UUID) error
 }

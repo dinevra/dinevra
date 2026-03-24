@@ -145,27 +145,53 @@ func (r *kitchenRepository) GetByCode(ctx context.Context, locationID uuid.UUID,
 
 func (r *kitchenRepository) UpdateConfiguration(ctx context.Context, config *domain.KitchenConfiguration) error {
 	query := `
-		INSERT INTO kitchen_configurations (kitchen_id, is_open, cart_message, currency, timezone, language, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
+		INSERT INTO kitchen_configurations (
+			kitchen_id, is_open, close_reason, last_state_change_at, last_state_change_by,
+			cart_message, currency, timezone, language, created_at, updated_at
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW())
 		ON CONFLICT (kitchen_id) 
 		DO UPDATE SET 
 			is_open = EXCLUDED.is_open,
+			close_reason = EXCLUDED.close_reason,
+			last_state_change_at = EXCLUDED.last_state_change_at,
+			last_state_change_by = EXCLUDED.last_state_change_by,
 			cart_message = EXCLUDED.cart_message,
 			currency = EXCLUDED.currency,
 			timezone = EXCLUDED.timezone,
 			language = EXCLUDED.language,
 			updated_at = NOW()
 	`
-	_, err := r.pool.Exec(ctx, query, config.KitchenID, config.IsOpen, config.CartMessage, config.Currency, config.Timezone, config.Language)
+	_, err := r.pool.Exec(ctx, query, 
+		config.KitchenID, config.IsOpen, config.CloseReason, 
+		config.LastStateChangeAt, config.LastStateChangeBy,
+		config.CartMessage, config.Currency, config.Timezone, config.Language,
+	)
 	return err
 }
 
-func (r *kitchenRepository) UpdateStatus(ctx context.Context, kitchenID uuid.UUID, isOpen bool) error {
+func (r *kitchenRepository) GetConfiguration(ctx context.Context, kitchenID uuid.UUID) (*domain.KitchenConfiguration, error) {
+	query := `SELECT 
+		kitchen_id, is_open, close_reason, last_state_change_at, last_state_change_by,
+		cart_message, currency, timezone, language, created_at, updated_at
+	FROM kitchen_configurations WHERE kitchen_id = $1`
+	
+	var c domain.KitchenConfiguration
+	err := r.pool.QueryRow(ctx, query, kitchenID).Scan(
+		&c.KitchenID, &c.IsOpen, &c.CloseReason, &c.LastStateChangeAt, &c.LastStateChangeBy,
+		&c.CartMessage, &c.Currency, &c.Timezone, &c.Language, &c.CreatedAt, &c.UpdatedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &c, nil
+}
+
+func (r *kitchenRepository) UpdateStatus(ctx context.Context, kitchenID uuid.UUID, isOpen bool, reason *string, changedBy uuid.UUID) error {
 	query := `
 		UPDATE kitchen_configurations 
-		SET is_open = $1, updated_at = NOW() 
-		WHERE kitchen_id = $2
+		SET is_open = $1, close_reason = $2, last_state_change_at = NOW(), last_state_change_by = $3, updated_at = NOW() 
+		WHERE kitchen_id = $4
 	`
-	_, err := r.pool.Exec(ctx, query, isOpen, kitchenID)
+	_, err := r.pool.Exec(ctx, query, isOpen, reason, changedBy, kitchenID)
 	return err
 }

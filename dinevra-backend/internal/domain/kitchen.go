@@ -37,14 +37,17 @@ type Kitchen struct {
 
 // KitchenConfiguration handles the dynamic settings overlay tied 1-1 to a Kitchen
 type KitchenConfiguration struct {
-	KitchenID   uuid.UUID `json:"kitchen_id" db:"kitchen_id"`
-	IsOpen      bool      `json:"is_open" db:"is_open"`
-	CartMessage string    `json:"cart_message" db:"cart_message"`
-	Currency    string    `json:"currency" db:"currency"`
-	Timezone    string    `json:"timezone" db:"timezone"`
-	Language    string    `json:"language" db:"language"`
-	CreatedAt   time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
+	KitchenID          uuid.UUID  `json:"kitchen_id" db:"kitchen_id"`
+	IsOpen             bool       `json:"is_open" db:"is_open"`
+	CloseReason        *string    `json:"close_reason,omitempty" db:"close_reason"`
+	LastStateChangeAt  *time.Time `json:"last_state_change_at,omitempty" db:"last_state_change_at"`
+	LastStateChangeBy  *uuid.UUID `json:"last_state_change_by,omitempty" db:"last_state_change_by"`
+	CartMessage        string     `json:"cart_message" db:"cart_message"`
+	Currency           string     `json:"currency" db:"currency"`
+	Timezone           string     `json:"timezone" db:"timezone"`
+	Language           string     `json:"language" db:"language"`
+	CreatedAt          time.Time  `json:"created_at" db:"created_at"`
+	UpdatedAt          time.Time  `json:"updated_at" db:"updated_at"`
 }
 
 // KitchenTimingSlot provides granular sub-day operational windows
@@ -106,4 +109,10 @@ type UpdateKitchenRequest struct {
 	RequirePinLogin          *bool   `json:"require_pin_login"`
 	DeviceRestrictionEnabled *bool   `json:"device_restriction_enabled"`
 	Status                   *string `json:"status"`
+}
+
+// UpdateKitchenStatusRequest handles the live operational toggle
+type UpdateKitchenStatusRequest struct {
+	IsOpen      bool    `json:"is_open"`
+	CloseReason *string `json:"close_reason"`
 }

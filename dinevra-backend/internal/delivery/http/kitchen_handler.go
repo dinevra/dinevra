@@ -34,6 +34,7 @@ func NewKitchenHandler(r *gin.RouterGroup, uc usecase.KitchenUsecase) {
 		kitchenActions.GET("", handler.GetKitchenByID)
 		kitchenActions.PUT("", handler.UpdateKitchen)
 		kitchenActions.DELETE("", handler.DeleteKitchen)
+		kitchenActions.GET("/config", handler.GetKitchenConfig)
 		kitchenActions.PUT("/config", handler.UpdateKitchenConfig)
 		kitchenActions.PATCH("/status", handler.ToggleKitchenStatus)
 	}
@@ -151,6 +152,25 @@ func (h *KitchenHandler) UpdateKitchenConfig(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "configuration updated successfully"})
 }
 
+func (h *KitchenHandler) GetKitchenConfig(c *gin.Context) {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid kitchen id"})
+		return
+	}
+
+	config, err := h.KitchenUsecase.GetKitchenConfig(c.Request.Context(), id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	if config == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "configuration not found"})
+		return
+	}
+	c.JSON(http.StatusOK, config)
+}
+
 func (h *KitchenHandler) ToggleKitchenStatus(c *gin.Context) {
 	kitchenID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
@@ -158,15 +178,20 @@ func (h *KitchenHandler) ToggleKitchenStatus(c *gin.Context) {
 		return
 	}
 
-	var req struct {
-		IsOpen bool `json:"is_open"`
-	}
+	var req domain.UpdateKitchenStatusRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if err := h.KitchenUsecase.ToggleKitchenStatus(c.Request.Context(), kitchenID, req.IsOpen); err != nil {
+	// Extract userID from context
+	userIDStr, exists := c.Get("user_id")
+	var userID uuid.UUID
+	if exists {
+		userID, _ = uuid.Parse(userIDStr.(string))
+	}
+
+	if err := h.KitchenUsecase.ToggleKitchenStatus(c.Request.Context(), kitchenID, req.IsOpen, req.CloseReason, userID); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
